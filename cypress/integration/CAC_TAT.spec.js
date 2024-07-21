@@ -183,7 +183,7 @@ describe("Central de Atendimento ao Cliente TAT", () => {
   });
 
   //Usando o select file - drag-drop
-  it.only('Uso do select file', () => {
+  it('Uso do select file', () => {
     cy.fixture('example.json').as('exampleFile')
     cy.get('input[type="file"]')
     .selectFile('@exampleFile')
