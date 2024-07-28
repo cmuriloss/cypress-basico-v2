@@ -1,6 +1,7 @@
 ////<reference types="Cypress"/>
 
 describe("Central de Atendimento ao Cliente TAT", () => {
+  const TRHEE_SECONDS = 3000
   before('Acesso a página', () => {
     cy.visit("https://cac-tat.s3.eu-central-1.amazonaws.com/index.html");
   });
@@ -11,6 +12,7 @@ describe("Central de Atendimento ao Cliente TAT", () => {
   });
   //Atividade 1 - Campos obrigatorios e envio de formulario
   it("Selecionar campo - primeiro nome", () => {
+    cy.clock();
     cy.get("#firstName")
       .should("be.visible")
       .click()
@@ -49,10 +51,13 @@ describe("Central de Atendimento ao Cliente TAT", () => {
 
     //Verificação do mensagem de sucesso
     cy.get(".success").should("be.visible");
+    cy.tick(TRHEE_SECONDS)
+    cy.get(".success").should("not.be.visible");
   });
 
   //Atividade 2 - Campos obrigatorios com erro, validação da mensagem de erro
   it("Envio de formulario com e-mail invalido", () => {
+    cy.clock()
     cy.get("#firstName")
       .type("Murilo")
       .should("have.value", "Murilo");
@@ -73,6 +78,8 @@ describe("Central de Atendimento ao Cliente TAT", () => {
 
     //Verificação do mensagem de erro
     cy.get(".error").should("be.visible");
+    cy.tick(TRHEE_SECONDS)
+    cy.get(".error").should("not.be.visible");
   });
 
   //Atividade 3- Validação campo vazio
@@ -191,5 +198,37 @@ describe("Central de Atendimento ao Cliente TAT", () => {
       expect($input[0].files[0].name).to.equal('example.json')
     }) 
 });
+  it('Validação da mensagem de sucesso e erro', () => {
+    cy.get('.success')
+    .should('not.be.visible')
+    .invoke('show')
+    .should('be.visible')
+    .and('contain', 'Mensagem enviada com sucesso.')
+    .invoke('hide')
+    .should('not.be.visible')
+  cy.get('.error')
+    .should('not.be.visible')
+    .invoke('show')
+    .should('be.visible')
+    .and('contain', 'Valide os campos obrigatórios!')
+    .invoke('hide')
+    .should('not.be.visible')
+  });
+
+  it('Faz uma requisição HTTP', () => {
+    cy.request('https://cac-tat.s3.eu-central-1.amazonaws.com/index.html')
+      .should(function(response){
+        const {status, statusText, body} = response
+        expect(status).to.equal(200)
+        expect(statusText).to.equal('OK')
+        expect(body).to.include('CAC TAT')
+      })
+  });
+
+  it.only('Visualização do gato!', () => {
+      cy.get('#cat')
+      .invoke('show')
+      .should('be.visible')
+  });
 
 });
